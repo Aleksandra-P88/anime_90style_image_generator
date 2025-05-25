@@ -112,4 +112,4 @@ if __name__ == "__main__":
         list_of_image = image.load_images_from_folder()
         image.lbp_anime_face_detect()
     except ValueError as error:
-        print("Błąd:", error)
+        print("Erorr:", error)
