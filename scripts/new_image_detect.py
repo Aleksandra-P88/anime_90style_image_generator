@@ -19,9 +19,9 @@ class DetectAnimeFace:
 
     def __init__(self, original_images_folder_path: str, model_path: str,
                  created_images_folder_path: str) -> None:
-        self._original_images_folder_path = original_images_folder_path
-        self._model_path = model_path
-        self._created_images_folder_path = created_images_folder_path
+        self.original_images_directory = original_images_folder_path
+        self.file_with_model = model_path
+        self.created_images_directory = created_images_folder_path
 
     @property
     def original_images_directory(self) -> str:
@@ -72,16 +72,17 @@ class DetectAnimeFace:
                 print(f"Folder '{value}' was created automatically.")
             except Exception as e:
                 raise ValueError(f"Failed to create folder '{value}': {e}")
-        self._created_images_directory = value
+        self._created_images_folder_path = value
 
     @created_images_directory.deleter
     def created_images_directory(self) -> None:
-        del self._created_images_directory
+        del self._created_images_folder_path
 
     def load_images_from_folder(self) -> list[tuple[str, numpy.array]]:
         """Read images from folder and add to the list."""
+        print()
         images: list[tuple[str, numpy.array]] = []
-        for filename in glob.glob(self.original_images_directory):
+        for filename in glob.glob(self.original_images_directory + '/*'):
             image: numpy.array = cv2.imread(filename)
             images.append((filename, image))
         return images
@@ -106,7 +107,7 @@ class DetectAnimeFace:
 
 if __name__ == "__main__":
     try:
-        image = DetectAnimeFace('E:/Programy/Image_Classification/Datasets/Sailor_Jupiter/*',
+        image = DetectAnimeFace('E:/Programy/Image_Classification/Datasets/Sailor_Jupiter',
                                 'E:/Programy/anime-face-detection/model/lbp_anime_face_detect.xml',
                                 'E:/Programy/Image_Classification/Datasets/T_Sailor_Jupiter_test')
         list_of_image = image.load_images_from_folder()
