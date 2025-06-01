@@ -13,7 +13,7 @@ class DetectAnimeFace:
     """
     Using this class you can find faces in animated images.
 
-    It provides methods: reading photos from a folder,
+    It provides methods: reading images from a folder,
     searching for faces and saving them to a given offerer.
     """
 
@@ -80,7 +80,6 @@ class DetectAnimeFace:
 
     def load_images_from_folder(self) -> list[tuple[str, numpy.array]]:
         """Read images from folder and add to the list."""
-        print()
         images: list[tuple[str, numpy.array]] = []
         for filename in glob.glob(self.original_images_directory + '/*'):
             image: numpy.array = cv2.imread(filename)
