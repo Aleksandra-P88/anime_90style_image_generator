@@ -97,19 +97,9 @@ class DetectAnimeFace:
             face_cascade: numpy.array = cv2.CascadeClassifier(self.file_with_model)
             faces = face_cascade.detectMultiScale(image_gray)
             for x, y, w, h in faces:
-                image: PIL.Image = PIL.Image.open(image[0])
-                part_image: PIL.Image = image.crop((x, y, (x+w), (y+h)))
+                image_path = image[0]
+                read_image = PIL.Image.open(image_path)
+                part_image: PIL.Image = read_image.crop((x, y, (x+w), (y+h)))
                 resized_image: PIL.Image = part_image.resize(new_size_of_image)
                 resized_image.save(f'{self.created_images_directory}/{index}.png')
                 index += 1
-
-
-if __name__ == "__main__":
-    try:
-        image = DetectAnimeFace('E:/Programy/Image_Classification/Datasets/Sailor_Jupiter',
-                                'E:/Programy/anime-face-detection/model/lbp_anime_face_detect.xml',
-                                'E:/Programy/Image_Classification/Datasets/T_Sailor_Jupiter_test')
-        list_of_image = image.load_images_from_folder()
-        image.lbp_anime_face_detect()
-    except ValueError as error:
-        print("Erorr:", error)

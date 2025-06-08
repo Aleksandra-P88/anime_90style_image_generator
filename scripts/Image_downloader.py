@@ -65,20 +65,24 @@ class DownloadImage:
     def description_individual_image(self) -> None:
         del self._individual_image
 
-
-    def fill_list_of_urls(self, number_of_page: int) -> list[str]:
+    def fill_list_of_urls(self, number_of_page: int,
+                          chosen_gallery: str) -> list[str]:
         """List of images links."""
-        #Gelbooru
-        #return [f'https://gelbooru.com/index.php?page=post&s=list&tags={self.tag}%pid={index}' for index in range(0,number_of_page,42)]
-        #Safebooru
-        return [f'https://safebooru.org/index.php?page=post&s=list&tags={self.tag}&pid={index}' for index in range(0,number_of_page,42)]
-        #Danbooru
-        #return [f'https://danbooru.donmai.us/posts?page={index}&tags={self.tag}' for index in range(number_of_page)][1:] 
+        if chosen_gallery == 'Gelbooru':
+            return [f'https://gelbooru.com/index.php?page=post&s=list&tags={self.tags}%pid={index}'
+                    for index in range(0, number_of_page, 42)]
+        elif chosen_gallery == 'Safebooru':
+            return [f'https://safebooru.org/index.php?page=post&s=list&tags={self.tags}&pid={index}'
+                    for index in range(0, number_of_page, 42)]
+        elif chosen_gallery == 'Danbooru':
+            return [f'https://danbooru.donmai.us/posts?page={index}&tags={self.tags}'
+                    for index in range(number_of_page)][1:]
 
-    def download_and_save_images(self, amount_of_pages: int, save_path: str):
+    def download_and_save_images(self, amount_of_pages: int, save_path: str,
+                                 chosen_gallery: str) -> None:
         """Download images."""
         counter: int = 0
-        list_of_urls = self.fill_list_of_urls(amount_of_pages)
+        list_of_urls = self.fill_list_of_urls(amount_of_pages, chosen_gallery)
         for item in list_of_urls:
             page = urllib.request.urlopen(item)
             page_soup = bs4.BeautifulSoup(page, 'html.parser')
@@ -90,9 +94,12 @@ class DownloadImage:
                 if not post_link_tag:
                     continue
                 post_href = post_link_tag.get('href')
-                full_post_url = f"https://safebooru.org/{post_href}"
-                #full_post_url = f"https://gelbooru.org/{post_href}"
-                #full_post_url = f"https://danbooru.org/{post_href}"
+                if chosen_gallery == 'Safebooru':
+                    full_post_url = f"https://safebooru.org/{post_href}"
+                elif chosen_gallery == 'Gelbooru':
+                    full_post_url = f"https://gelbooru.org/{post_href}"
+                elif chosen_gallery == 'Danbooru':
+                    full_post_url = f"https://danbooru.org/{post_href}"
                 post_page = urllib.request.urlopen(full_post_url)
                 post_soup = bs4.BeautifulSoup(post_page, 'html.parser')
                 full_img_tag = post_soup.find('img', id='image')
@@ -100,6 +107,12 @@ class DownloadImage:
                     continue
                 full_img_url = full_img_tag.get('src')
                 file_name = str(counter)
+                if not os.path.isdir(save_path):
+                    try:
+                        os.makedirs(save_path, exist_ok=True)
+                        print(f"Folder '{save_path}' was created automatically.")
+                    except Exception as e:
+                        raise ValueError(f"Failed to create folder '{save_path}': {e}")
                 complete_path = os.path.join(save_path, file_name + ".jpeg")
                 image_data = urllib.request.urlopen(full_img_url).read()
                 image = PIL.Image.open(io.BytesIO(image_data))
@@ -107,16 +120,3 @@ class DownloadImage:
                     image = image.convert("RGB")
                 image.save(complete_path, "JPEG")
                 counter += 1
-
-#Danboruu
-#downloadimage = DownloadImage('retro_artstyle+solo', 'posts-container gap-2', 'post-preview-container')
-#downloadimage.download_and_save_images(389, 'E:\Programy\Image_Classification/Datasets/danbooru_90s')
-
-#Safebooru
-downloadimage = DownloadImage('takeuchi_naoko+sailor_moon', 'content', 'thumb')
-downloadimage.download_and_save_images(42, "E:\Programy\Image_Classification\Datasets\T_Usagi")
-
-##Gelbooru 
-
-#downloadimage = DownloadImage('1990s_%28style%29+solo', 'thumbnail-container', 'thumbnail-preview')
-#downloadimage.download_and_save_images(23058, "E:\Programy\Datasets\Image_Classification\gelbooru_90s")

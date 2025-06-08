@@ -1,1 +1,0 @@
-new_image_detect - > tutaj może być problem ze ścieżkami ( \ -> /)

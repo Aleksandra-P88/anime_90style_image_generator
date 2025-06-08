@@ -5,8 +5,8 @@ import os
 import numpy
 import PIL
 
-import diffusers
-import transfomers
+
+import transformers
 
 
 class ImageToText:
@@ -49,8 +49,6 @@ class ImageToText:
     def file_with_model(self, value: str) -> None:
         if not isinstance(value, str):
             raise ValueError("The path to the model must be a string.")
-        if not os.path.isfile(value):
-            raise ValueError(f"The path '{value}' does not exist.")
         self._model_path = value
 
     @file_with_model.deleter
@@ -88,8 +86,8 @@ class ImageToText:
 
     def create_text_from_image(self):
         """Genrate texts."""
-        image_to_text = diffusers.pipeline("image-to-text",
-                                           model=self.file_with_model)
+        image_to_text = transformers.pipeline("image-to-text",
+                                              model=self.file_with_model)
         for filename, _ in self.read_image_from_folder():
             result = image_to_text(filename, max_new_tokens=50)
             generated_text = result[0]['generated_text']
@@ -99,14 +97,3 @@ class ImageToText:
             text_file_path = os.path.join(self.new_folder_path, text_filename)
             with open(text_file_path, "w", encoding="utf-8") as text_file:
                 text_file.write(generated_text)
-
-
-if __name__ == "__main__":
-    try:
-        image = ImageToText('T_Sailor_Jupiter_test',
-                            'Salesforce/blip-image-captioning-large',
-                            'T_Sailor_Jupiter_test')
-        list_of_image = image.read_images_from_folder()
-        image.create_text_from_image()
-    except ValueError as error:
-        print("Erorr:", error)
