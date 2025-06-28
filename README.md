@@ -13,6 +13,9 @@ Dreambooth technique gives better results when texts are added to the exercise i
 * `main` - this script is used to run other scripts.
 * `const` - script with constants.
 
+
+The folder `model` come from repository [https://github.com/XavierJiezou/anime-face-detection](https://github.com/XavierJiezou/anime-face-detection)
+
 In the `original_anime90_image` there are taken (resized, background removed, which is currently done manually) 
 pictures of 90s style anime characters.
 
