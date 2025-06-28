@@ -90,3 +90,52 @@ def __getitem__(self, index):
 
     return example
 ```
+
+These are the parameter settings for Dreambooth network training
+
+```python
+## dreambooth with caption
+!accelerate launch diffusers/examples/dreambooth/train_dreambooth.py \
+--pretrained_model_name_or_path='stable-diffusion-v1-5/stable-diffusion-v1-5' \
+--instance_data_dir='Mix_Face_90style_anime' \
+--instance_prompt='retrovers' \
+--output_dir='Mix_Face_90style_anime_model_big' \
+--resume_from_checkpoint='checkpoint-5000' \
+--resolution=512 \
+--train_text_encoder \
+--train_batch_size=2 \
+--sample_batch_size=2 \
+--max_train_steps=6000 \
+--checkpointing_steps=1000 \
+--gradient_checkpointing \
+--learning_rate=1e-6 \
+--lr_scheduler='constant' \
+--lr_warmup_steps=0 \
+--use_8bit_adam \
+--validation_prompt='retovers, portrait of a young girl, blonde hair, blue eyes' \
+--num_validation_images=2 \
+--mixed_precision='fp16'
+
+```
+
+Below is the code that generates the image based on the trained model:
+
+```python
+from diffusers import StableDiffusionPipeline
+import torch
+
+pipe = StableDiffusionPipeline.from_pretrained(
+    "Aleksandra11/90style_anime_face_model",
+    torch_dtype=torch.float16,
+    use_safetensors=True  # or False if using .bin files
+).to("cuda")
+
+# Generate image
+prompt = "retrovers, retrovers, gothic lolita girl with voluminous wavy hair, red roses woven into hair, porcelain doll face, dramatic eye makeup, frilly black lace dress with corset, large sparkling eyes, melancholic expression, dark victorian background, ornate details, soft lighting, ultra-detailed, high resolution, baroque elegance"
+image = pipe(prompt, num_inference_steps=100, guidance_scale=7.5).images[0]
+image.save("output.png")
+image
+```
+Example result:
+
+![Image](output.png)
