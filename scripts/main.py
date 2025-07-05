@@ -43,6 +43,6 @@ def text_from_image() -> None:
 
 
 if __name__ == "__main__":
-    download_images_from_internet()
-    detect_faces()
+    #download_images_from_internet()
+    #detect_faces()
     text_from_image()

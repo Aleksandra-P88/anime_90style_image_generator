@@ -33,7 +33,7 @@ class ImageToText:
         if not isinstance(value, str):
             raise ValueError("The path to the images folder must be a string.")
         if not os.path.isdir(value):
-            raise ValueError(f"Folder '{value}' was not found.")
+            print(f"Folder '{value}' was not found. Creating a new one.")  
         self._original_images_folder_path = value
 
     @original_images_directory.deleter
@@ -73,7 +73,7 @@ class ImageToText:
     def read_images_from_folder(self) -> list[tuple[str, numpy.array]]:
         """Load images from which the text is created."""
         images: list[tuple[str, numpy.array]] = []
-        for filename in glob.glob(self.original_images_director + '/*'):
+        for filename in glob.glob(self.original_images_directory + '/*'):
             try:
                 if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
                     print(f"Skipping non-image file: {filename}")
@@ -88,12 +88,12 @@ class ImageToText:
         """Genrate texts."""
         image_to_text = transformers.pipeline("image-to-text",
                                               model=self.file_with_model)
-        for filename, _ in self.read_image_from_folder():
+        for filename, _ in self.read_images_from_folder():
             result = image_to_text(filename, max_new_tokens=50)
             generated_text = result[0]['generated_text']
             print(f"Generated text for {filename}: {generated_text}")
             base_filename = os.path.basename(filename)
             text_filename = os.path.splitext(base_filename)[0] + ".txt"
-            text_file_path = os.path.join(self.new_folder_path, text_filename)
+            text_file_path = os.path.join(self.choosen_images_directory, text_filename)
             with open(text_file_path, "w", encoding="utf-8") as text_file:
                 text_file.write(generated_text)
